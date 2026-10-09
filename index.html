@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Arabic Numbers Hub 11-20</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@400;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Base Styles & Utilities */
+        body {
+            font-family: 'Anek Malayalam', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .arabic-text { font-family: 'Sakkal Majalla', 'Amiri', serif; }
+
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 80% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px) rotate(-5deg); } 50% { transform: translateX(5px) rotate(5deg); } 75% { transform: translateX(-5px) rotate(-5deg); } }
+        @keyframes balloonFloat { 0% { transform: translateY(100vh) rotate(-5deg); opacity: 1; } 100% { transform: translateY(-20vh) rotate(5deg); opacity: 1; } }
+        @keyframes confettiDrop { 0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
+        @keyframes sparkle { 0% { transform: scale(0) rotate(0deg); opacity: 0; } 50% { transform: scale(1.5) rotate(180deg); opacity: 1; } 100% { transform: scale(0) rotate(360deg); opacity: 0; } }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.4); } 50% { box-shadow: 0 0 20px 10px rgba(236, 72, 153, 0); } }
+
+        /* General UI Elements */
+        .btn-3d { transition: all 0.1s; position: relative; top: 0; cursor: pointer; }
+        .btn-3d:active { top: 4px; box-shadow: 0 0px 0 0px transparent !important; }
+        
+        /* Desktop Hover Effects */
+        @media (hover: hover) and (pointer: fine) {
+            .btn-3d:hover { transform: scale(1.02); filter: brightness(1.05); }
+            .draggable:hover { transform: scale(1.05); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+            .memory-card:hover { transform: scale(1.03); }
+            .balloon:hover { transform: scale(1.05); }
+        }
+
+        .card-3d { box-shadow: 0 4px 0 0px rgba(0,0,0,0.2); transition: transform 0.1s, box-shadow 0.1s; }
+        
+        .cartoon-element { animation: float 3s infinite ease-in-out; }
+        .screen { display: none; height: 100%; width: 100%; flex-direction: column; }
+        .screen.active { display: flex; animation: popIn 0.3s ease-out forwards; }
+
+        .draggable { cursor: grab; transition: transform 0.2s, box-shadow 0.2s; will-change: transform; z-index: 10; }
+        .draggable:active { cursor: grabbing; }
+        .draggable.dragging { opacity: 0.9; transform: scale(1.1); box-shadow: 0 15px 25px rgba(0,0,0,0.3); z-index: 1000; }
+        .droppable { transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .droppable.drag-over { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,255,255,0.8); border-color: #fff; }
+        .matched { pointer-events: none; animation: popIn 0.5s ease-out forwards; }
+        .wrong-match { animation: shake 0.4s ease-in-out; border-color: #ef4444 !important; }
+
+        .balloon { position: absolute; bottom: -100px; cursor: pointer; transition: transform 0.1s; user-select: none; display: flex; flex-direction: column; items-center; justify-center; z-index: 20;}
+        .balloon:active { transform: scale(0.9); }
+        .balloon-tail { width: 2px; height: 40px; background: #cbd5e1; margin: 0 auto; }
+        .balloon-body { width: 80px; height: 95px; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.2), inset 10px 10px 20px rgba(255,255,255,0.4); display: flex; align-items: center; justify-center; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); position: relative;}
+        .balloon-body::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid inherit; }
+
+        .memory-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; width: 100%; max-width: 400px; margin: 0 auto; }
+        .memory-card { aspect-ratio: 1; perspective: 1000px; cursor: pointer; }
+        .memory-card-inner { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; }
+        .memory-card.flipped .memory-card-inner { transform: rotateY(180deg); }
+        .memory-card-front, .memory-card-back { width: 100%; height: 100%; position: absolute; backface-visibility: hidden; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 3px solid white;}
+        .memory-card-front { background: linear-gradient(135deg, #a78bfa, #c084fc); transform: rotateY(0deg); }
+        .memory-card-back { background: white; transform: rotateY(180deg); flex-direction: column; text-align: center; }
+        .memory-card.matched { visibility: hidden; opacity: 0; transition: opacity 0.5s ease-out; }
+
+        .sequence-box { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; background: white; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); border: 2px dashed #94a3b8; }
+        .sequence-filled { background: linear-gradient(135deg, #38bdf8, #3b82f6); color: white; border: none; box-shadow: 0 4px 0 #1d4ed8; }
+        
+        .audio-btn { animation: pulse-glow 2s infinite; }
+        
+        /* Utils */
+        .confetti { position: fixed; width: 10px; height: 10px; z-index: 9999; top: -10px; }
+        .sparkle-effect { position: absolute; top: 50%; left: 50%; width: 60px; height: 60px; margin-top: -30px; margin-left: -30px; background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%); animation: sparkle 0.5s ease-out forwards; pointer-events: none; z-index: 10; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-sky-50" onload="initApp()">
+
+    <div id="screen-menu" class="screen active relative bg-gradient-to-b from-sky-200 to-indigo-100">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <i class="fas fa-star absolute top-10 right-10 text-yellow-400 text-3xl cartoon-element opacity-50"></i>
+            <i class="fas fa-paw absolute bottom-20 left-10 text-pink-400 text-4xl cartoon-element opacity-40"></i>
+            <i class="fas fa-moon absolute top-20 left-20 text-blue-300 text-5xl cartoon-element opacity-50" style="animation-delay: 1s;"></i>
+        </div>
+
+        <div class="flex flex-col items-center justify-center h-full p-4 z-10 w-full max-w-md mx-auto">
+            <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-4 border-white mb-8 w-full text-center relative">
+                <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-yellow-400 rounded-full w-16 h-16 flex items-center justify-center border-4 border-white shadow-lg">
+                    <i class="fas fa-gamepad text-3xl text-white"></i>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-600 mt-4 leading-tight drop-shadow-sm">
+                    അറബി നമ്പറുകൾ<br>പഠിക്കാം!
+                </h1>
+                <p class="text-slate-500 text-sm font-bold mt-2">11 മുതൽ 20 വരെ</p>
+            </div>
+
+            <div class="w-full flex flex-col gap-3 overflow-y-auto hide-scroll pb-10 px-2">
+                <!-- Menu Buttons -->
+                <button onclick="startGame(1)" class="btn-3d w-full bg-gradient-to-r from-rose-400 to-pink-500 rounded-2xl p-4 flex items-center gap-4 shadow-[0_6px_0_#be123c] border-2 border-white/50 text-white">
+                    <div class="bg-white/30 rounded-xl w-14 h-14 flex items-center justify-center shrink-0">
+                        <i class="fas fa-hand-pointer text-2xl drop-shadow-md"></i>
+                    </div>
+                    <div class="text-right flex-1">
+                        <h2 class="text-xl font-bold">ചേർത്തു വെക്കാം</h2>
+                        <p class="text-xs opacity-90">വാക്കുകൾ നമ്പറിലേക്ക് വലിച്ചിടുക</p>
+                    </div>
+                </button>
+
+                <button onclick="startGame(2)" class="btn-3d w-full bg-gradient-to-r from-sky-400 to-blue-500 rounded-2xl p-4 flex items-center gap-4 shadow-[0_6px_0_#1d4ed8] border-2 border-white/50 text-white mt-2">
+                    <div class="bg-white/30 rounded-xl w-14 h-14 flex items-center justify-center shrink-0">
+                        <i class="fas fa-balloon text-2xl drop-shadow-md"></i>
+                    </div>
+                    <div class="text-right flex-1">
+                        <h2 class="text-xl font-bold">ബലൂൺ ഗെയിം</h2>
+                        <p class="text-xs opacity-90">ശരിയായ ബലൂൺ പൊട്ടിക്കുക</p>
+                    </div>
+                </button>
+
+                <button onclick="startGame(3)" class="btn-3d w-full bg-gradient-to-r from-violet-400 to-purple-500 rounded-2xl p-4 flex items-center gap-4 shadow-[0_6px_0_#6d28d9] border-2 border-white/50 text-white mt-2">
+                    <div class="bg-white/30 rounded-xl w-14 h-14 flex items-center justify-center shrink-0">
+                        <i class="fas fa-clone text-2xl drop-shadow-md"></i>
+                    </div>
+                    <div class="text-right flex-1">
+                        <h2 class="text-xl font-bold">ഓർമ്മ പരിശോധിക്കാം</h2>
+                        <p class="text-xs opacity-90">ഒരേ കാർഡുകൾ ജോഡിയാക്കുക</p>
+                    </div>
+                </button>
+
+                <button onclick="startGame(4)" class="btn-3d w-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-2xl p-4 flex items-center gap-4 shadow-[0_6px_0_#b45309] border-2 border-white/50 text-white mt-2">
+                    <div class="bg-white/30 rounded-xl w-14 h-14 flex items-center justify-center shrink-0">
+                        <i class="fas fa-train text-2xl drop-shadow-md"></i>
+                    </div>
+                    <div class="text-right flex-1">
+                        <h2 class="text-xl font-bold">വിട്ടുപോയത് കണ്ടെത്താം</h2>
+                        <p class="text-xs opacity-90">നമ്പറുകൾ ക്രമത്തിൽ വെക്കുക</p>
+                    </div>
+                </button>
+
+                <button onclick="startGame(5)" class="btn-3d w-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-2xl p-4 flex items-center gap-4 shadow-[0_6px_0_#047857] border-2 border-white/50 text-white mt-2 mb-4">
+                    <div class="bg-white/30 rounded-xl w-14 h-14 flex items-center justify-center shrink-0">
+                        <i class="fas fa-volume-up text-2xl drop-shadow-md"></i>
+                    </div>
+                    <div class="text-right flex-1">
+                        <h2 class="text-xl font-bold">കേട്ട് കണ്ടുപിടിക്കാം</h2>
+                        <p class="text-xs opacity-90">ശബ്ദം കേട്ട് നമ്പർ എടുക്കുക</p>
+                    </div>
+                </button>
+            </div>
+
+            <div class="mt-auto pt-2 text-center w-full shrink-0 z-20">
+                <p class="text-xs font-bold text-slate-600 bg-white/70 inline-block px-4 py-1.5 rounded-full shadow-sm backdrop-blur-md border border-white/50">
+                    Developed by <span class="text-violet-700 font-black">GLPS MUNDEKARAD</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="shared-header" class="hidden absolute top-0 left-0 w-full z-50 flex-row justify-between items-center p-3 border-b border-white/50 bg-white/80 backdrop-blur-md shadow-sm">
+        <button onclick="returnToMenu()" class="btn-3d w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center shadow-[0_4px_0_#cbd5e1] border-2 border-white">
+            <i class="fas fa-home text-lg"></i>
+        </button>
+        
+        <div class="flex-1 text-center px-2">
+            <h2 id="game-title" class="text-lg font-black text-violet-600 leading-tight">ഗെയിം</h2>
+        </div>
+
+        <div class="text-center bg-gradient-to-b from-yellow-100 to-yellow-200 px-3 py-1 rounded-2xl border-2 border-yellow-300 shadow-[0_3px_0_#d97706] flex flex-col justify-center min-w-[70px]">
+            <p class="text-[8px] text-yellow-800 font-bold uppercase leading-none">സ്കോർ</p>
+            <p class="text-base font-black text-pink-500 leading-none" id="score-display">0/5</p>
+        </div>
+    </div>
+
+    <div id="screen-game1" class="screen relative bg-gradient-to-b from-sky-100 to-indigo-50 pt-16">
+        <div class="flex flex-col flex-1 overflow-hidden z-10 w-full max-w-md mx-auto relative">
+            
+            <!-- Draggable Words -->
+            <div class="shrink-0 flex flex-col pt-2 pb-4 px-2 z-20 h-[35%]">
+                <div class="text-xs font-bold text-center mb-2 text-violet-600 bg-white/60 py-1 rounded-full shadow-sm mx-auto px-4 inline-flex items-center gap-2 border border-violet-100">
+                    <i class="fas fa-hand-pointer text-violet-400 cartoon-element"></i> വലിച്ചിടുക
+                </div>
+                <div id="g1-words-container" class="flex flex-wrap justify-center gap-2 items-center content-center h-full">
+                    <!-- Words injected here -->
+                </div>
+            </div>
+
+            <!-- Target Numbers Grid -->
+            <div class="flex-1 bg-white/70 rounded-t-[40px] border-t-4 border-white shadow-[0_-10px_20px_rgba(0,0,0,0.05)] p-4 flex flex-col relative h-[65%]">
+                 <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-pink-400 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md border-2 border-white cartoon-element">
+                    <i class="fas fa-arrow-down text-sm"></i>
+                </div>
+                
+                <div id="g1-numbers-container" class="grid grid-cols-2 gap-3 mt-4 overflow-y-auto hide-scroll pb-10 content-start">
+                    <!-- Numbers injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-game2" class="screen relative bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] bg-sky-300 pt-20 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-sky-300/50 to-blue-500/80 pointer-events-none"></div>
+        
+        <div class="relative z-10 w-full max-w-md mx-auto flex flex-col items-center h-full">
+            <!-- Target Box -->
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl p-4 shadow-xl border-4 border-white mb-4 w-11/12 text-center transform hover:scale-105 transition-transform mt-2">
+                <p class="text-xs font-bold text-sky-600 mb-1">ഈ നമ്പർ കണ്ടുപിടിക്കൂ:</p>
+                <h3 id="g2-target-word" class="arabic-text text-4xl text-violet-700 font-bold leading-none mb-2"></h3>
+                <p id="g2-target-mal" class="text-sm font-bold bg-violet-100 text-violet-800 px-3 py-1 rounded-full inline-block"></p>
+            </div>
+            
+            <!-- Balloon Area -->
+            <div id="g2-balloon-area" class="flex-1 w-full relative overflow-hidden">
+                <!-- Balloons spawned via JS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-game3" class="screen relative bg-gradient-to-br from-purple-100 to-fuchsia-100 pt-20">
+        <div class="w-full max-w-md mx-auto h-full flex flex-col items-center">
+            <div class="text-sm font-bold text-purple-700 bg-white/70 py-1.5 px-6 rounded-full shadow-sm mb-4 border border-purple-200">
+                ശരിയായ ജോഡി കണ്ടെത്തുക
+            </div>
+            
+            <div id="g3-memory-grid" class="memory-grid flex-1 content-start">
+                <!-- Cards injected here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-game4" class="screen relative bg-gradient-to-b from-amber-50 to-orange-100 pt-20">
+        <div class="w-full max-w-md mx-auto h-full flex flex-col p-4">
+            
+            <div class="bg-white rounded-3xl shadow-lg p-6 text-center border-4 border-orange-200 mb-8 relative">
+                 <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-orange-400 rounded-full w-12 h-12 flex items-center justify-center border-4 border-white text-white text-xl shadow-md">
+                    <i class="fas fa-question"></i>
+                </div>
+                <h3 class="text-lg font-bold text-orange-700 mb-6 mt-2">വിട്ടുപോയ നമ്പർ ഏതാണ്?</h3>
+                
+                <!-- Train / Sequence Area -->
+                <div id="g4-sequence-container" class="flex justify-center items-center gap-2 mb-4" dir="ltr">
+                    <!-- Boxes injected here -->
+                </div>
+            </div>
+
+            <!-- Options Area -->
+            <div class="bg-white/50 rounded-3xl p-4 flex-1 border-2 border-white/60">
+                <p class="text-center text-sm font-bold text-slate-500 mb-4">ഇതിൽ നിന്നും തിരഞ്ഞെടുക്കുക:</p>
+                <div id="g4-options-container" class="flex flex-wrap justify-center gap-4">
+                    <!-- Options injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-game5" class="screen relative bg-gradient-to-br from-emerald-50 to-teal-100 pt-20">
+        <div class="w-full max-w-md mx-auto h-full flex flex-col items-center p-4">
+            
+            <div class="bg-white/90 rounded-full p-8 shadow-2xl border-8 border-teal-200 mb-8 cursor-pointer audio-btn transform hover:scale-105 transition-transform" onclick="playG5Audio()">
+                <i class="fas fa-volume-up text-6xl text-teal-500"></i>
+                <p class="text-xs font-bold text-teal-600 text-center mt-2 absolute -bottom-6 w-full left-0">കേൾക്കാൻ അമർത്തുക</p>
+            </div>
+            
+            <div id="g5-options-container" class="grid grid-cols-2 gap-4 w-full mt-4">
+                <!-- 4 Options injected here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="result-screen" class="hidden fixed inset-0 z-[100] items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-sm rounded-[40px] shadow-2xl p-8 text-center relative border-4 border-yellow-400 transform scale-0 transition-transform duration-500 ease-out" id="result-modal">
+            <div class="absolute -top-16 left-1/2 transform -translate-x-1/2 text-7xl text-yellow-400 drop-shadow-lg cartoon-element">
+                <i class="fas fa-trophy"></i>
+            </div>
+            
+            <h2 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-500 mt-6 mb-2">
+                ഗംഭീരം!
+            </h2>
+            <p class="text-xl text-slate-700 mb-6 font-bold" id="result-message">
+                നീ എല്ലാം ശരിയാക്കി!
+            </p>
+
+            <div class="flex flex-col gap-3 justify-center items-center w-full">
+                <button id="next-level-btn" class="btn-3d py-4 font-black text-white rounded-2xl text-xl bg-gradient-to-b from-blue-400 to-blue-600 shadow-[0_6px_0_#1d4ed8] border-2 border-blue-300 w-full" onclick="nextLevelG1()">
+                    <i class="fas fa-arrow-right mr-2"></i> അടുത്ത ലെവൽ
+                </button>
+                <button class="btn-3d py-4 font-black text-white rounded-2xl text-xl bg-gradient-to-b from-green-400 to-green-600 shadow-[0_6px_0_#047857] border-2 border-green-300 w-full" onclick="restartCurrentGame()">
+                    <i class="fas fa-redo mr-2"></i> വീണ്ടും കളിക്കാം
+                </button>
+                <button class="btn-3d py-3 font-bold text-slate-600 rounded-2xl text-lg bg-slate-100 shadow-[0_4px_0_#cbd5e1] border-2 border-white w-full mt-2" onclick="returnToMenu()">
+                    <i class="fas fa-home mr-2"></i> മെനുവിലേക്ക്
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script>
+        const numberData = [
+            { id: 11, arabic: '١١', word: 'أَحَدَ عَشَرَ', malayalam: 'അഹദ അഷറ', color: 'from-rose-400 to-pink-500', border: 'border-pink-300', hex: '#f43f5e' },
+            { id: 12, arabic: '١٢', word: 'اِثْنَا عَشَرَ', malayalam: 'ഇസ്നാ അഷറ', color: 'from-violet-400 to-purple-500', border: 'border-purple-300', hex: '#8b5cf6' },
+            { id: 13, arabic: '١٣', word: 'ثَلَاثَةَ عَشَرَ', malayalam: 'സലാസത്ത അഷറ', color: 'from-blue-400 to-cyan-500', border: 'border-blue-300', hex: '#0ea5e9' },
+            { id: 14, arabic: '١٤', word: 'أَرْبَعَةَ عَشَرَ', malayalam: 'അർബഅത്ത അഷറ', color: 'from-emerald-400 to-teal-500', border: 'border-emerald-300', hex: '#10b981' },
+            { id: 15, arabic: '١٥', word: 'خَمْسَةَ عَشَرَ', malayalam: 'ഹംസത്ത അഷറ', color: 'from-amber-400 to-orange-500', border: 'border-orange-300', hex: '#f59e0b' },
+            { id: 16, arabic: '١٦', word: 'سِتَّةَ عَشَرَ', malayalam: 'സിത്തത്ത അഷറ', color: 'from-fuchsia-400 to-pink-600', border: 'border-fuchsia-300', hex: '#d946ef' },
+            { id: 17, arabic: '١٧', word: 'سَبْعَةَ عَشَرَ', malayalam: 'സബ്അത്ത അഷറ', color: 'from-indigo-400 to-blue-600', border: 'border-indigo-300', hex: '#6366f1' },
+            { id: 18, arabic: '١٨', word: 'ثَمَانِيَةَ عَشَرَ', malayalam: 'സമാനിയത്ത അഷറ', color: 'from-teal-400 to-emerald-600', border: 'border-teal-300', hex: '#14b8a6' },
+            { id: 19, arabic: '١٩', word: 'تِسْعَةَ عَشَرَ', malayalam: 'തിസ്അത്ത അഷറ', color: 'from-orange-400 to-red-500', border: 'border-red-300', hex: '#ef4444' },
+            { id: 20, arabic: '٢٠', word: 'عِشْرُونَ', malayalam: 'ഇശ്റൂന', color: 'from-sky-400 to-blue-500', border: 'border-sky-300', hex: '#3b82f6' }
+        ];
+
+        let currentActiveGame = 0; // 0 = menu
+        let score = 0;
+        let maxScore = 5;
+        const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+
+        // Game specific variables
+        let g1Level = 1;
+        let g2Target = null;
+        let g2Interval = null;
+        let g3Cards = [];
+        let g3Flipped = [];
+        let g4Target = null;
+        let g5Target = null;
+
+        // Touch handling globally for drag/drop
+        let draggedItem = null;
+
+        // --- Audio Functions ---
+        function playSound(type) {
+            Tone.start();
+            const now = Tone.now();
+            if (type === 'pop') synth.triggerAttackRelease("C5", "32n", now);
+            else if (type === 'error') synth.triggerAttackRelease(["C3", "D#3"], "8n", now);
+            else if (type === 'win') {
+                const notes = ["C4", "E4", "G4", "C5", "E5", "G5"];
+                notes.forEach((note, i) => synth.triggerAttackRelease(note, "8n", now + i * 0.1));
+            } else if (type === 'flip') synth.triggerAttackRelease("A4", "32n", now);
+        }
+
+        function playVoice(text, isAhsanta = false) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // stop current
+                const msg = new SpeechSynthesisUtterance();
+                msg.text = text;
+                msg.lang = 'ar-SA';
+                msg.rate = isAhsanta ? 0.9 : 0.8; 
+                msg.pitch = 1.1; 
+                window.speechSynthesis.speak(msg);
+            }
+        }
+
+        // --- Navigation ---
+        function initApp() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-menu').classList.add('active');
+            document.getElementById('shared-header').style.display = 'none';
+        }
+
+        function startGame(gameNumber) {
+            currentActiveGame = gameNumber;
+            score = 0;
+            
+            // UI Setup
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(`screen-game${gameNumber}`).classList.add('active');
+            document.getElementById('shared-header').style.display = 'flex';
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('result-modal').classList.remove('scale-100');
+            
+            // Cleanups
+            if(g2Interval) clearInterval(g2Interval);
+            document.getElementById('g2-balloon-area').innerHTML = '';
+
+            // Initialize specific game
+            switch(gameNumber) {
+                case 1:
+                    document.getElementById('game-title').textContent = "ചേർത്തു വെക്കാം";
+                    g1Level = 1;
+                    maxScore = 5;
+                    initGame1();
+                    break;
+                case 2:
+                    document.getElementById('game-title').textContent = "ബലൂൺ പൊട്ടിക്കാം";
+                    maxScore = 5;
+                    initGame2();
+                    break;
+                case 3:
+                    document.getElementById('game-title').textContent = "ഓർമ്മ പരിശോധിക്കാം";
+                    maxScore = 6;
+                    initGame3();
+                    break;
+                case 4:
+                    document.getElementById('game-title').textContent = "വിട്ടുപോയത് കണ്ടെത്താം";
+                    maxScore = 5;
+                    initGame4();
+                    break;
+                case 5:
+                    document.getElementById('game-title').textContent = "കേട്ട് കണ്ടുപിടിക്കാം";
+                    maxScore = 5;
+                    initGame5();
+                    break;
+            }
+            updateScoreDisplay();
+        }
+
+        function returnToMenu() {
+            if(g2Interval) clearInterval(g2Interval);
+            document.getElementById('result-screen').style.display = 'none';
+            initApp();
+        }
+
+        function restartCurrentGame() {
+            startGame(currentActiveGame);
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('score-display').textContent = `${score}/${maxScore}`;
+            if (score >= maxScore) {
+                setTimeout(showWinScreen, 800);
+            }
+        }
+
+        function showWinScreen() {
+            playSound('win');
+            document.getElementById('result-screen').style.display = 'flex';
+            
+            // Special handling for Game 1 multi-level
+            const nextBtn = document.getElementById('next-level-btn');
+            if (currentActiveGame === 1 && g1Level === 1) {
+                nextBtn.style.display = 'block';
+                document.getElementById('result-message').textContent = "ആദ്യ ലെവൽ പൂർത്തിയാക്കി!";
+            } else {
+                nextBtn.style.display = 'none';
+                document.getElementById('result-message').textContent = "നീ എല്ലാം ശരിയാക്കി!";
+            }
+
+            setTimeout(() => {
+                document.getElementById('result-modal').classList.add('scale-100');
+            }, 50);
+            createConfetti();
+        }
+
+        function createConfetti() {
+            document.querySelectorAll('.confetti').forEach(e => e.remove());
+            const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+            for (let i = 0; i < 60; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.animation = `confettiDrop ${Math.random() * 2 + 1.5}s linear forwards`;
+                conf.style.animationDelay = `${Math.random() * 0.5}s`;
+                document.body.appendChild(conf);
+            }
+        }
+
+        // Utils
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+        function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+        function initGame1() {
+            const wCont = document.getElementById('g1-words-container');
+            const nCont = document.getElementById('g1-numbers-container');
+            wCont.innerHTML = ''; nCont.innerHTML = '';
+            
+            const levelData = g1Level === 1 ? numberData.slice(0, 5) : numberData.slice(5, 10);
+            
+            // Layout Adjustments for mobile: 2 rows of words, 2 cols of numbers
+            shuffle([...levelData]).forEach(data => {
+                const w = document.createElement('div');
+                // Compact word card for Game 1
+                w.className = 'draggable card-3d bg-white p-1.5 rounded-xl border-2 border-violet-200 flex flex-col items-center justify-center cursor-grab relative w-[30%] min-w-[100px] h-16';
+                w.setAttribute('data-id', data.id);
+                w.innerHTML = `
+                    <span class="arabic-text text-xl text-violet-700 font-bold leading-none mb-1">${data.word}</span>
+                    <span class="text-slate-600 font-bold text-[9px] bg-violet-50 px-2 rounded-full leading-tight w-full text-center truncate">${data.malayalam}</span>
+                `;
+                
+                // Events
+                w.addEventListener('touchstart', g1DragStart, {passive: false});
+                w.addEventListener('touchmove', g1DragMove, {passive: false});
+                w.addEventListener('touchend', g1DragEnd);
+                w.addEventListener('mousedown', g1DragStart); // For Desktop Mouse
+                
+                wCont.appendChild(w);
+            });
+
+            shuffle([...levelData]).forEach(data => {
+                const n = document.createElement('div');
+                n.className = `droppable bg-gradient-to-br ${data.color} rounded-2xl flex flex-col items-center justify-center relative shadow-md border-2 border-white/60 h-24 target-3d transition-all duration-300`;
+                n.setAttribute('data-id', data.id);
+                n.innerHTML = `
+                    <div class="number-icon arabic-text font-black text-white drop-shadow-md text-5xl mt-2">${data.arabic}</div>
+                    <div class="absolute bottom-1 right-2 text-white/90 font-bold text-xs bg-black/20 px-1.5 rounded-full">${data.id}</div>
+                    <div class="placeholder absolute inset-0 flex-col items-center justify-center p-1 bg-white/20 backdrop-blur-sm hidden w-full h-full"></div>
+                `;
+                nCont.appendChild(n);
+            });
+        }
+
+        function nextLevelG1() {
+            g1Level = 2;
+            score = 0;
+            updateScoreDisplay();
+            document.getElementById('result-screen').style.display = 'none';
+            initGame1();
+        }
+
+        // Universal Drag Functions for Touch and Mouse
+        function g1DragStart(e) {
+            if (e.type === 'mousedown' && e.button !== 0) return; // Only left click allowed
+            e.preventDefault(); 
+            draggedItem = this;
+            
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            
+            const clone = this.cloneNode(true);
+            clone.id = 'touch-clone';
+            clone.className = this.className + ' dragging fixed pointer-events-none z-[9999] opacity-90 scale-110';
+            clone.style.left = `${clientX - this.offsetWidth/2}px`;
+            clone.style.top = `${clientY - this.offsetHeight/2}px`;
+            clone.style.width = `${this.offsetWidth}px`;
+            clone.style.height = `${this.offsetHeight}px`;
+            clone.style.margin = '0';
+            document.body.appendChild(clone);
+            this.style.opacity = '0.2';
+            playSound('pop');
+
+            if (e.type === 'mousedown') {
+                document.addEventListener('mousemove', g1DragMove);
+                document.addEventListener('mouseup', g1DragEnd);
+            }
+        }
+
+        function g1DragMove(e) {
+            if(!draggedItem) return;
+            e.preventDefault();
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            const clone = document.getElementById('touch-clone');
+            
+            if(clone) {
+                clone.style.left = `${clientX - clone.offsetWidth/2}px`;
+                clone.style.top = `${clientY - clone.offsetHeight/2}px`;
+            }
+
+            document.querySelectorAll('.droppable').forEach(dz => {
+                const rect = dz.getBoundingClientRect();
+                if(clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom) {
+                    dz.classList.add('drag-over');
+                } else dz.classList.remove('drag-over');
+            });
+        }
+
+        function g1DragEnd(e) {
+            if(!draggedItem) return;
+            const clone = document.getElementById('touch-clone');
+            if(clone) clone.remove();
+            draggedItem.style.opacity = '1';
+            
+            const clientX = e.type.includes('mouse') ? e.clientX : e.changedTouches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.changedTouches[0].clientY;
+            
+            document.querySelectorAll('.droppable').forEach(dz => {
+                const rect = dz.getBoundingClientRect();
+                if(clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom) {
+                    dz.classList.remove('drag-over');
+                    if(dz.dataset.id === draggedItem.dataset.id) {
+                        playVoice('أَحْسَنْتَ', true);
+                        dz.classList.add('matched');
+                        
+                        // Visual update
+                        const ph = dz.querySelector('.placeholder');
+                        ph.style.display = 'flex';
+                        ph.classList.remove('bg-white/20', 'backdrop-blur-sm');
+                        
+                        draggedItem.className = 'w-full h-full flex flex-col items-center justify-center relative z-10 bg-transparent border-none shadow-none';
+                        draggedItem.querySelector('.arabic-text').className = 'arabic-text text-2xl font-bold text-white leading-none drop-shadow-md mt-1';
+                        draggedItem.querySelector('span:not(.arabic-text)').className = 'text-white font-bold text-[10px] w-full text-center bg-black/20 rounded-full px-1 mt-1 shadow-inner';
+                        
+                        ph.appendChild(draggedItem);
+                        
+                        const sp = document.createElement('div');
+                        sp.className = 'sparkle-effect'; dz.appendChild(sp);
+                        
+                        score++; updateScoreDisplay();
+                    } else {
+                        playSound('error');
+                        dz.classList.add('wrong-match');
+                        setTimeout(() => dz.classList.remove('wrong-match'), 400);
+                    }
+                }
+            });
+            
+            if (e.type === 'mouseup') {
+                document.removeEventListener('mousemove', g1DragMove);
+                document.removeEventListener('mouseup', g1DragEnd);
+            }
+            draggedItem = null;
+        }
+
+        function initGame2() {
+            setNewG2Target();
+            g2Interval = setInterval(spawnBalloon, 1200);
+        }
+
+        function setNewG2Target() {
+            g2Target = numberData[randomInt(0, 9)];
+            document.getElementById('g2-target-word').textContent = g2Target.word;
+            document.getElementById('g2-target-mal').textContent = g2Target.malayalam;
+            playVoice(g2Target.word);
+        }
+
+        function spawnBalloon() {
+            if(score >= maxScore) { clearInterval(g2Interval); return; }
+            
+            const area = document.getElementById('g2-balloon-area');
+            const b = document.createElement('div');
+            
+            // 40% chance to spawn the correct target, else random
+            const data = Math.random() > 0.6 ? g2Target : numberData[randomInt(0, 9)];
+            
+            const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+            const color = colors[randomInt(0, colors.length-1)];
+            
+            const startX = randomInt(10, 80); // percentage
+            
+            b.className = 'balloon';
+            b.style.left = `${startX}%`;
+            b.style.animation = `balloonFloat ${randomInt(4, 6)}s linear forwards`;
+            
+            b.innerHTML = `
+                <div class="balloon-body" style="background-color: ${color}; border-color: ${color}">
+                    <span class="arabic-text font-black text-white text-4xl w-full text-center">${data.arabic}</span>
+                </div>
+                <div class="balloon-tail"></div>
+            `;
+            
+            b.onclick = () => {
+                if(data.id === g2Target.id) {
+                    playVoice('أَحْسَنْتَ', true);
+                    createExplosion(b, color);
+                    b.remove();
+                    score++; updateScoreDisplay();
+                    if(score < maxScore) setTimeout(setNewG2Target, 1000);
+                } else {
+                    playSound('error');
+                    b.style.transform = 'scale(0.8) rotate(10deg)';
+                }
+            };
+            
+            area.appendChild(b);
+            
+            // Cleanup
+            setTimeout(() => { if(b.parentNode) b.remove(); }, 6000);
+        }
+
+        function createExplosion(element, color) {
+            const rect = element.getBoundingClientRect();
+            for(let i=0; i<8; i++) {
+                const p = document.createElement('div');
+                p.style.position = 'fixed'; p.style.left = rect.left + 40 + 'px'; p.style.top = rect.top + 40 + 'px';
+                p.style.width = '10px'; p.style.height = '10px'; p.style.backgroundColor = color;
+                p.style.borderRadius = '50%'; p.style.zIndex = '1000';
+                p.style.transition = 'all 0.4s ease-out';
+                document.body.appendChild(p);
+                setTimeout(() => {
+                    p.style.transform = `translate(${(Math.random()-0.5)*100}px, ${(Math.random()-0.5)*100}px) scale(0)`;
+                    p.style.opacity = '0';
+                }, 10);
+                setTimeout(() => p.remove(), 400);
+            }
+        }
+
+        function initGame3() {
+            const grid = document.getElementById('g3-memory-grid');
+            grid.innerHTML = '';
+            g3Cards = []; g3Flipped = [];
+            
+            // Pick 6 random pairs
+            const selected = shuffle([...numberData]).slice(0, 6);
+            const deck = [];
+            
+            selected.forEach(d => {
+                deck.push({ type: 'num', data: d, id: d.id });
+                deck.push({ type: 'word', data: d, id: d.id });
+            });
+            
+            shuffle(deck).forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.id = item.id;
+                card.dataset.index = index;
+                
+                const content = item.type === 'num' 
+                    ? `<div class="arabic-text text-5xl text-purple-700">${item.data.arabic}</div>`
+                    : `<div class="flex flex-col items-center justify-center p-1 w-full"><div class="arabic-text text-2xl text-purple-700 leading-none mb-1 text-center w-full break-words">${item.data.word}</div><div class="text-[9px] font-bold text-slate-500 text-center w-full break-words leading-tight">${item.data.malayalam}</div></div>`;
+
+                card.innerHTML = `
+                    <div class="memory-card-inner">
+                        <div class="memory-card-front">
+                            <i class="fas fa-question text-3xl text-white/50"></i>
+                        </div>
+                        <div class="memory-card-back">
+                            ${content}
+                        </div>
+                    </div>
+                `;
+                
+                card.onclick = () => flipCard(card);
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard(card) {
+            if(g3Flipped.length >= 2 || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+            
+            playSound('flip');
+            card.classList.add('flipped');
+            g3Flipped.push(card);
+            
+            if(g3Flipped.length === 2) {
+                setTimeout(checkMatch, 800);
+            }
+        }
+
+        function checkMatch() {
+            const [c1, c2] = g3Flipped;
+            if(c1.dataset.id === c2.dataset.id) {
+                playVoice('أَحْسَنْتَ', true);
+                c1.classList.add('matched'); c2.classList.add('matched');
+                score++; updateScoreDisplay();
+            } else {
+                playSound('error');
+                c1.classList.remove('flipped'); c2.classList.remove('flipped');
+            }
+            g3Flipped = [];
+        }
+
+        function initGame4() {
+            const seqCont = document.getElementById('g4-sequence-container');
+            const optCont = document.getElementById('g4-options-container');
+            seqCont.innerHTML = ''; optCont.innerHTML = '';
+            
+            // Choose sequence 11-15 or 16-20 randomly
+            const isFirstHalf = Math.random() > 0.5;
+            const seqData = isFirstHalf ? numberData.slice(0, 5) : numberData.slice(5, 10);
+            
+            // Pick one index to hide
+            const missingIndex = randomInt(0, 4);
+            g4Target = seqData[missingIndex];
+            
+            seqData.forEach((data, index) => {
+                const box = document.createElement('div');
+                if(index === missingIndex) {
+                    box.className = 'sequence-box droppable border-4 border-dashed border-orange-300 bg-orange-50';
+                    box.dataset.id = data.id;
+                } else {
+                    box.className = 'sequence-box sequence-filled';
+                    box.innerHTML = `<span class="arabic-text">${data.arabic}</span>`;
+                }
+                seqCont.appendChild(box);
+            });
+            
+            // Create options (The missing one + 3 random ones)
+            const options = [g4Target];
+            while(options.length < 4) {
+                const rand = numberData[randomInt(0, 9)];
+                if(!options.includes(rand) && !seqData.includes(rand)) options.push(rand);
+            }
+            
+            shuffle(options).forEach(data => {
+                const opt = document.createElement('div');
+                opt.className = 'draggable btn-3d bg-white rounded-2xl w-16 h-16 flex items-center justify-center border-2 border-orange-200 shadow-[0_4px_0_#fed7aa]';
+                opt.dataset.id = data.id;
+                opt.innerHTML = `<span class="arabic-text text-3xl text-orange-600">${data.arabic}</span>`;
+                
+                // Add click support as alternative to drag for mobile simplicity
+                opt.onclick = () => handleG4Click(data, opt);
+                
+                optCont.appendChild(opt);
+            });
+        }
+        
+        function handleG4Click(data, element) {
+            const targetBox = document.querySelector('.sequence-box.droppable');
+            if(!targetBox) return;
+            
+            if(data.id === g4Target.id) {
+                playVoice('أَحْسَنْتَ', true);
+                targetBox.classList.remove('droppable', 'border-dashed', 'border-orange-300', 'bg-orange-50');
+                targetBox.classList.add('sequence-filled', 'matched');
+                targetBox.innerHTML = `<span class="arabic-text">${data.arabic}</span>`;
+                element.style.visibility = 'hidden';
+                
+                score++; updateScoreDisplay();
+                if(score < maxScore) setTimeout(initGame4, 1500);
+            } else {
+                playSound('error');
+                element.classList.add('wrong-match');
+                setTimeout(() => element.classList.remove('wrong-match'), 400);
+            }
+        }
+
+        function initGame5() {
+            const optCont = document.getElementById('g5-options-container');
+            optCont.innerHTML = '';
+            
+            g5Target = numberData[randomInt(0, 9)];
+            
+            const options = [g5Target];
+            while(options.length < 4) {
+                const rand = numberData[randomInt(0, 9)];
+                if(!options.find(o => o.id === rand.id)) options.push(rand);
+            }
+            
+            shuffle(options).forEach(data => {
+                const opt = document.createElement('div');
+                opt.className = `btn-3d bg-white rounded-3xl p-4 flex flex-col items-center justify-center border-4 ${data.border} shadow-[0_6px_0_var(--tw-shadow-color)] min-h-[120px]`;
+                opt.style.setProperty('--tw-shadow-color', data.hex);
+                opt.innerHTML = `
+                    <span class="arabic-text text-5xl font-black text-slate-700 mb-2">${data.arabic}</span>
+                    <span class="text-sm font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-center w-full truncate">${data.malayalam}</span>
+                `;
+                
+                opt.onclick = () => {
+                    if(data.id === g5Target.id) {
+                        playVoice('أَحْسَنْتَ', true);
+                        opt.classList.add('matched');
+                        opt.style.backgroundColor = '#dcfce7'; // green-100
+                        opt.style.borderColor = '#22c55e'; // green-500
+                        score++; updateScoreDisplay();
+                        if(score < maxScore) setTimeout(initGame5, 1500);
+                    } else {
+                        playSound('error');
+                        opt.classList.add('wrong-match');
+                        setTimeout(() => opt.classList.remove('wrong-match'), 400);
+                    }
+                };
+                
+                optCont.appendChild(opt);
+            });
+            
+            setTimeout(playG5Audio, 500);
+        }
+
+        function playG5Audio() {
+            if(g5Target) playVoice(g5Target.word);
+        }
+
+    </script>
+</body>
+</html>
